@@ -3,37 +3,66 @@ import os
 from langchain.document_loaders.generic import GenericLoader
 from langchain.document_loaders.parsers import OpenAIWhisperParser
 from langchain.document_loaders.blob_loaders.youtube_audio import YoutubeAudioLoader
-# from langchain.chains import RetrievalQA
-# from langchain.vectorstores import FAISS
-# from langchain.chat_models import ChatOpenAI
-# from langchain.embeddings import OpenAIEmbeddings
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain.indexes import VectorstoreIndexCreator
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains import RetrievalQA
+from langchain.chat_models import ChatOpenAI
 
+# OPENAI Key
 os.environ["OPENAI_API_KEY"] = "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"
 
-# working code
-# video_id = "QsYGlZkevEg"
-# loader = YoutubeLoader(video_id)
-# docs=loader.load()
-
-# index = VectorstoreIndexCreator()
-# index = index.from_documents(docs)
-# response = index.query("Where was the show the Last of Us filmed?")
-# print(f"Answer: {response}")
-
 # Two Karpathy lecture videos
-urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
+# urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
 
-# Directory to save audio files
-save_dir = "~/Downloads/YouTube"
+# Pedro Pascal video (shorter)
+urls = ["https://www.youtube.com/watch?v=QsYGlZkevEg&t=52s&ab_channel=SaturdayNightLive"]
+
+# Change directory as needed
+save_dir = "/Users/rachel/Downloads/YouTube"
 
 # Transcribe the videos to text
 loader = GenericLoader(YoutubeAudioLoader(urls, save_dir), OpenAIWhisperParser())
-print(loader)
 docs = loader.load()
 
-YoutubeAudioLoader(urls, save_dir)
+# checking how many docs there are
+# print(len(docs))
 
-# Returns a list of Documents, which can be easily viewed or parsed
-print(len(docs))
+# works yay!
+# print(docs[0].page_content[0:100])
+
+# Text embedding time
+# Combine doc(s)
+combined_docs = [doc.page_content for doc in docs]
+text = " ".join(combined_docs)
+# Split the docs with Recurisve Char Text Splitter
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap = 0)
+splits = text_splitter.split_text(text)
+# Index building and vector stores!
+embeddings = OpenAIEmbeddings()
+vectordb = FAISS.from_texts(splits, embeddings)
+
+
+# Getting input from user 
+
+# First build the QA chain
+qa_chain = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+    chain_type="stuff",
+    retriever=vectordb.as_retriever(),
+)
+
+query="What did Pedro Pascal film most recently?"
+print(qa_chain.run(query))
+# Answers: "Pedro Pascal most recently filmed a show called The Last of Us on HBO."
+
+while True:
+    query = input("What's your question? (Press 'q' or 'quit' to exit the program.) ")
+    if (query.lower() == "q" or query.lower() == "quit"):
+        print("Thanks for using this imitation ChatBot!")
+        break
+    else:
+        response = qa_chain.run(query)
+        print(f"Answer: {response}")
+        # print(qa_chain.run(query))
+
