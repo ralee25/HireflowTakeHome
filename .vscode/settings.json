@@ -3,5 +3,6 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "python.formatting.provider": "none",
-  "python.terminal.activateEnvironment": false
+  "python.terminal.activateEnvironment": false,
+  "python.condaPath": "C:\\Program Files\\miniconda3\\Scripts\\conda.exe"
 }
