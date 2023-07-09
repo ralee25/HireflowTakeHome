@@ -1,5 +1,4 @@
 import os
-# from langchain.document_loaders import YoutubeLoader
 from langchain.document_loaders.generic import GenericLoader
 from langchain.document_loaders.parsers import OpenAIWhisperParser
 from langchain.document_loaders.blob_loaders.youtube_audio import YoutubeAudioLoader
@@ -12,11 +11,24 @@ from langchain.chat_models import ChatOpenAI
 # OPENAI Key
 os.environ["OPENAI_API_KEY"] = "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"
 
-# Two Karpathy lecture videos
+# Two Karpathy lecture videos (longer)
 # urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
 
 # Pedro Pascal video (shorter)
-urls = ["https://www.youtube.com/watch?v=QsYGlZkevEg&t=52s&ab_channel=SaturdayNightLive"]
+# urls = ["https://www.youtube.com/watch?v=QsYGlZkevEg&t=52s&ab_channel=SaturdayNightLive"]
+urls=[]
+while True:
+    youtube_url = input("Insert YouTube url you wish ChatBot to learn from (at least 1 | press 'q' or 'quit' to quit adding): ")
+    if (youtube_url.lower() != "q" or youtube_url.lower() != "quit"):
+        urls.append(youtube_url)
+        print(len(urls))
+    else:
+        if (len(urls) == 0):
+            print(len(urls))
+            continue
+        else:
+            break
+
 
 # Change directory as needed
 save_dir = "/Users/rachel/Downloads/YouTube"
@@ -52,8 +64,8 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=vectordb.as_retriever(),
 )
 
-query="What did Pedro Pascal film most recently?"
-print(qa_chain.run(query))
+# query="What did Pedro Pascal film most recently?"
+# print(qa_chain.run(query))
 # Answers: "Pedro Pascal most recently filmed a show called The Last of Us on HBO."
 
 while True:
