@@ -25,7 +25,7 @@ while True:
     youtube_url = input("Insert YouTube url you wish ChatBot to learn from (at least 1 | press 'q' or 'quit' to quit adding): ")
     if (youtube_url.lower() != "q" and youtube_url.lower() != "quit"):
         urls.append(youtube_url)
-        print(urls)
+        # print(urls)
     else:
         # must add at least one url so keeps prompting user same question if they immediately quit without adding 
         if (len(urls) > 0 and (youtube_url.lower() == "q" or youtube_url.lower() == "quit")):
