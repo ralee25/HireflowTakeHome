@@ -10,7 +10,8 @@ from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 
 # OPENAI Key
-os.environ["OPENAI_API_KEY"] = "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"
+OPENAI_API_KEY = input("Input API key for OpenAI: ")
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 # Example YouTube urls
 # Two Karpathy lecture videos (longer)
