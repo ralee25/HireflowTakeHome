@@ -20,18 +20,20 @@ os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 # Pedro Pascal video (shorter)
 # urls = ["https://www.youtube.com/watch?v=QsYGlZkevEg&t=52s&ab_channel=SaturdayNightLive"]
 
+# Barbie w/puppies
+# urls = ["https://www.youtube.com/watch?v=s5bI_732Cqs&t=19s&ab_channel=BuzzFeedCeleb"]
 #Collecting the YouTube Urls we want ChatBot to learn from
 urls=[]
 while True:
     youtube_url = input("Insert YouTube url you wish ChatBot to learn from (at least 1 | press 'q' or 'quit' to quit adding): ")
     if (youtube_url.lower() != "q" and youtube_url.lower() != "quit"):
         urls.append(youtube_url)
-        # print(urls)
     else:
         # must add at least one url so keeps prompting user same question if they immediately quit without adding 
         if (len(urls) > 0 and (youtube_url.lower() == "q" or youtube_url.lower() == "quit")):
             break
 
+# print(urls)
 
 # Change directory as needed
 save_dir = "/Users/rachel/Downloads/YouTube"
@@ -41,8 +43,6 @@ loader = GenericLoader(YoutubeAudioLoader(urls, save_dir), OpenAIWhisperParser()
 docs = loader.load()
 
 # debugging
-# checking how many docs there are
-# print(len(docs))
 # works yay!
 # print(docs[0].page_content[0:100])
 
@@ -50,12 +50,16 @@ docs = loader.load()
 # Combine doc(s)
 combined_docs = [doc.page_content for doc in docs]
 text = " ".join(combined_docs)
+
 # Split the docs with Recurisve Char Text Splitter
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap = 0)
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=300,
+    chunk_overlap = 0)
 splits = text_splitter.split_text(text)
 # Index building and vector stores!
 embeddings = OpenAIEmbeddings()
 vectordb = FAISS.from_texts(splits, embeddings)
+
 
 # Getting input from user 
 
